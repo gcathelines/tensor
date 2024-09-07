@@ -45,11 +45,11 @@ func (w WeatherForecast) ToProperties() (*types.WeatherForecastProperties, error
 }
 
 type HourlyData struct {
-	Time             []string  `json:"time"`
-	Temperature2m    []float64 `json:"temperature_2m"`
-	Precipitation    []float64 `json:"precipitation"`
-	WindSpeed10m     []float64 `json:"wind_speed_10m"`
-	WindDirection10m []float64 `json:"wind_direction_10m"`
+	Time          []string  `json:"time"`
+	Temperature   []float64 `json:"temperature_2m"`
+	Precipitation []float64 `json:"precipitation"`
+	WindSpeed     []float64 `json:"wind_speed_10m"`
+	WindDirection []float64 `json:"wind_direction_10m"`
 }
 
 type DailyData struct {
@@ -59,23 +59,23 @@ type DailyData struct {
 
 func (d HourlyData) ToWeatherForecasts() ([]types.WeatherForecast, error) {
 	dataCount := len(d.Time)
-	if len(d.Temperature2m) != dataCount ||
+	if len(d.Temperature) != dataCount ||
 		len(d.Precipitation) != dataCount ||
-		len(d.WindSpeed10m) != dataCount ||
-		len(d.WindDirection10m) != dataCount {
+		len(d.WindSpeed) != dataCount ||
+		len(d.WindDirection) != dataCount {
 		msg := fmt.Sprintf("invalid data length, time %d, temp %d, precipitation %d, wind speed %d, wind direction %d",
-			dataCount, len(d.Temperature2m), len(d.Precipitation), len(d.WindSpeed10m), len(d.WindDirection10m))
+			dataCount, len(d.Temperature), len(d.Precipitation), len(d.WindSpeed), len(d.WindDirection))
 		return nil, errors.New(msg)
 	}
 
 	forecasts := make([]types.WeatherForecast, 0, dataCount)
 	for i := 0; i < dataCount; i++ {
 		forecasts = append(forecasts, types.WeatherForecast{
-			Time:             d.Time[i],
-			Temperature2m:    d.Temperature2m[i],
-			Precipitation:    d.Precipitation[i],
-			WindSpeed10m:     d.WindSpeed10m[i],
-			WindDirection10m: d.WindDirection10m[i],
+			Time:          d.Time[i],
+			Temperature:   d.Temperature[i],
+			Precipitation: d.Precipitation[i],
+			WindSpeed:     d.WindSpeed[i],
+			WindDirection: d.WindDirection[i],
 		})
 	}
 	return forecasts, nil

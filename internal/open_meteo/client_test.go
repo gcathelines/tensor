@@ -44,25 +44,25 @@ func TestOpenMeteoClient_GetWeatherForecast(t *testing.T) {
 				HasPrecipitationToday: false,
 				WeatherForecasts: []types.WeatherForecast{
 					{
-						Time:             "2024-09-06T00:00",
-						Temperature2m:    22.1,
-						Precipitation:    0.1,
-						WindSpeed10m:     11.9,
-						WindDirection10m: 85,
+						Time:          "2024-09-06T00:00",
+						Temperature:   22.1,
+						Precipitation: 0.1,
+						WindSpeed:     11.9,
+						WindDirection: 85,
 					},
 					{
-						Time:             "2024-09-06T01:00",
-						Temperature2m:    21.2,
-						Precipitation:    0.2,
-						WindSpeed10m:     12.4,
-						WindDirection10m: 80,
+						Time:          "2024-09-06T01:00",
+						Temperature:   21.2,
+						Precipitation: 0.2,
+						WindSpeed:     12.4,
+						WindDirection: 80,
 					},
 					{
-						Time:             "2024-09-06T02:00",
-						Temperature2m:    20.5,
-						Precipitation:    0.3,
-						WindSpeed10m:     12.8,
-						WindDirection10m: 80,
+						Time:          "2024-09-06T02:00",
+						Temperature:   20.5,
+						Precipitation: 0.3,
+						WindSpeed:     12.8,
+						WindDirection: 80,
 					},
 				},
 			},
@@ -124,25 +124,25 @@ func TestOpenMeteoClient_GetWeatherForecasts(t *testing.T) {
 					HasPrecipitationToday: true,
 					WeatherForecasts: []types.WeatherForecast{
 						{
-							Time:             "2024-09-07T00:00",
-							Temperature2m:    18.4,
-							Precipitation:    0.2,
-							WindSpeed10m:     5.9,
-							WindDirection10m: 104,
+							Time:          "2024-09-07T00:00",
+							Temperature:   18.4,
+							Precipitation: 0.2,
+							WindSpeed:     5.9,
+							WindDirection: 104,
 						},
 						{
-							Time:             "2024-09-07T01:00",
-							Temperature2m:    17.8,
-							Precipitation:    0.5,
-							WindSpeed10m:     6.6,
-							WindDirection10m: 99,
+							Time:          "2024-09-07T01:00",
+							Temperature:   17.8,
+							Precipitation: 0.5,
+							WindSpeed:     6.6,
+							WindDirection: 99,
 						},
 						{
-							Time:             "2024-09-07T02:00",
-							Temperature2m:    17.3,
-							Precipitation:    2.1,
-							WindSpeed10m:     7.1,
-							WindDirection10m: 120,
+							Time:          "2024-09-07T02:00",
+							Temperature:   17.3,
+							Precipitation: 2.1,
+							WindSpeed:     7.1,
+							WindDirection: 120,
 						},
 					},
 				},
@@ -150,25 +150,25 @@ func TestOpenMeteoClient_GetWeatherForecasts(t *testing.T) {
 					HasPrecipitationToday: false,
 					WeatherForecasts: []types.WeatherForecast{
 						{
-							Time:             "2024-09-07T00:00",
-							Temperature2m:    25.9,
-							Precipitation:    2.7,
-							WindSpeed10m:     9,
-							WindDirection10m: 157,
+							Time:          "2024-09-07T00:00",
+							Temperature:   25.9,
+							Precipitation: 2.7,
+							WindSpeed:     9,
+							WindDirection: 157,
 						},
 						{
-							Time:             "2024-09-07T01:00",
-							Temperature2m:    25.5,
-							Precipitation:    2.6,
-							WindSpeed10m:     8.4,
-							WindDirection10m: 155,
+							Time:          "2024-09-07T01:00",
+							Temperature:   25.5,
+							Precipitation: 2.6,
+							WindSpeed:     8.4,
+							WindDirection: 155,
 						},
 						{
-							Time:             "2024-09-07T02:00",
-							Temperature2m:    25.2,
-							Precipitation:    0.5,
-							WindSpeed10m:     6.9,
-							WindDirection10m: 152,
+							Time:          "2024-09-07T02:00",
+							Temperature:   25.2,
+							Precipitation: 0.5,
+							WindSpeed:     6.9,
+							WindDirection: 152,
 						},
 					},
 				},
@@ -197,7 +197,7 @@ func TestOpenMeteoClient_GetWeatherForecasts(t *testing.T) {
 	}
 }
 
-func TestOpenMeteoClient_GetElevation(t *testing.T) {
+func TestOpenMeteoClient_GetElevations(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -209,22 +209,22 @@ func TestOpenMeteoClient_GetElevation(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		lat      float64
-		long     float64
+		lat      []float64
+		long     []float64
 		err      error
 		expected float64
 	}{
 		{
 			name:     "failed, bad request",
-			lat:      200.1,
-			long:     200.1,
+			lat:      []float64{200.1},
+			long:     []float64{200.1},
 			err:      errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
 			expected: 0,
 		},
 		{
 			name:     "success",
-			lat:      47.36865,
-			long:     8.539183,
+			lat:      []float64{47.36865, 72.580003},
+			long:     []float64{8.539183, 23.0333},
 			err:      nil,
 			expected: 38.01,
 		},
@@ -232,7 +232,7 @@ func TestOpenMeteoClient_GetElevation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := cl.GetElevation(ctx, tt.lat, tt.long)
+			resp, err := cl.GetElevations(ctx, tt.lat, tt.long)
 			if tt.err != nil {
 				if err == nil || err.Error() != tt.err.Error() {
 					t.Fatalf("expected error: %v, got: %v", tt.err, err)

@@ -18,6 +18,7 @@ type PowerPlant struct {
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
 	Version   int64     `json:"version"`
+	Elevation float64   `json:"elevation"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	WeatherForecastProperties
@@ -29,9 +30,9 @@ type WeatherForecastProperties struct {
 }
 
 type WeatherForecast struct {
-	Time             string  `json:"time"`
-	Temperature2m    float64 `json:"temperature_2m"`
-	Precipitation    float64 `json:"precipitation"`
-	WindSpeed10m     float64 `json:"wind_speed_10m"`
-	WindDirection10m float64 `json:"wind_direction_10m"`
+	Time          string  `json:"time"`
+	Temperature   float64 `json:"temperature"`
+	Precipitation float64 `json:"precipitation"`
+	WindSpeed     float64 `json:"wind_speed"`
+	WindDirection float64 `json:"wind_direction"`
 }

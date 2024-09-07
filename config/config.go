@@ -8,16 +8,34 @@ import (
 
 // Config represents the application configuration.
 type Config struct {
+	ServerConfig    ServerConfig    `yaml:"server"`
 	DBConfig        DBConfig        `yaml:"db"`
 	OpenMeteoConfig OpenMeteoConfig `yaml:"openmeteo"`
 }
 
+// Validate validates the configuration.
 func (c Config) Validate() error {
 	if err := c.DBConfig.Validate(); err != nil {
 		return err
 	}
 	if err := c.OpenMeteoConfig.Validate(); err != nil {
 		return err
+	}
+	if err := c.ServerConfig.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ServerConfig represents the server configuration.
+type ServerConfig struct {
+	Port string `yaml:"port"`
+}
+
+// Validate validates the server configuration.
+func (c ServerConfig) Validate() error {
+	if c.Port == "" {
+		return errors.New("serverconfig port is required")
 	}
 	return nil
 }
@@ -31,6 +49,7 @@ type DBConfig struct {
 	DBName   string `yaml:"dbname"`
 }
 
+// Validate validates the database configuration.
 func (c DBConfig) Validate() error {
 	if c.Host == "" {
 		return errors.New("dbconfig host is required")
@@ -61,6 +80,7 @@ type OpenMeteoConfig struct {
 	Timeout time.Duration `yaml:"timeout"`
 }
 
+// Validate validates the OpenMeteo configuration.
 func (c *OpenMeteoConfig) Validate() error {
 	if c.APIURL == "" {
 		return errors.New("openmeteoconfig api_url is required")

@@ -27,18 +27,18 @@ func (f *fakeWeatherAPI) GetWeatherForecast(ctx context.Context, latitudes float
 	return &types.WeatherForecastProperties{
 		WeatherForecasts: []types.WeatherForecast{
 			{
-				Time:             "2024-09-06T00:00",
-				Temperature2m:    1.1,
-				Precipitation:    2.2,
-				WindSpeed10m:     3.3,
-				WindDirection10m: 4.4,
+				Time:          "2024-09-06T00:00",
+				Temperature:   1.1,
+				Precipitation: 2.2,
+				WindSpeed:     3.3,
+				WindDirection: 4.4,
 			},
 			{
-				Time:             "2024-09-06T01:00",
-				Temperature2m:    11.1,
-				Precipitation:    21.2,
-				WindSpeed10m:     31.3,
-				WindDirection10m: 41.4,
+				Time:          "2024-09-06T01:00",
+				Temperature:   11.1,
+				Precipitation: 21.2,
+				WindSpeed:     31.3,
+				WindDirection: 41.4,
 			},
 		},
 		HasPrecipitationToday: true,
@@ -58,18 +58,18 @@ func (f *fakeWeatherAPI) GetWeatherForecasts(ctx context.Context, latitudes []fl
 			HasPrecipitationToday: hasPrecipitationToday,
 			WeatherForecasts: []types.WeatherForecast{
 				{
-					Time:             "2024-09-06T00:00",
-					Temperature2m:    0.1 + float64(i),
-					Precipitation:    0.2 + float64(i),
-					WindSpeed10m:     0.3 + float64(i),
-					WindDirection10m: 0.4 + float64(i),
+					Time:          "2024-09-06T00:00",
+					Temperature:   0.1 + float64(i),
+					Precipitation: 0.2 + float64(i),
+					WindSpeed:     0.3 + float64(i),
+					WindDirection: 0.4 + float64(i),
 				},
 				{
-					Time:             "2024-09-06T01:00",
-					Temperature2m:    0.1 + float64(i*10),
-					Precipitation:    0.2 + float64(i*10),
-					WindSpeed10m:     0.3 + float64(i*10),
-					WindDirection10m: 0.4 + float64(i*10),
+					Time:          "2024-09-06T01:00",
+					Temperature:   0.1 + float64(i*10),
+					Precipitation: 0.2 + float64(i*10),
+					WindSpeed:     0.3 + float64(i*10),
+					WindDirection: 0.4 + float64(i*10),
 				},
 			},
 		})
@@ -77,8 +77,13 @@ func (f *fakeWeatherAPI) GetWeatherForecasts(ctx context.Context, latitudes []fl
 
 	return forecasts, nil
 }
-func (f *fakeWeatherAPI) GetElevation(ctx context.Context, latitude float64, longitude float64) (float64, error) {
-	return latitude / longitude, nil
+func (f *fakeWeatherAPI) GetElevations(ctx context.Context, latitude []float64, longitude []float64) ([]float64, error) {
+	res := make([]float64, 0, len(latitude))
+	for i := 0; i < len(latitude); i++ {
+		res = append(res, latitude[i]/longitude[i])
+	}
+
+	return res, nil
 }
 
 type fakeDB struct{}

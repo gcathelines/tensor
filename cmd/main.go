@@ -3,12 +3,17 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"log"
+	"net/http"
 	"os"
 
 	_ "github.com/lib/pq"
 	"gopkg.in/yaml.v3"
 
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gcathelines/tensor-energy-case/config"
+	"github.com/gcathelines/tensor-energy-case/graph"
 	"github.com/gcathelines/tensor-energy-case/internal/database"
 	"github.com/gcathelines/tensor-energy-case/internal/open_meteo"
 	"github.com/gcathelines/tensor-energy-case/internal/usecase"
@@ -16,8 +21,12 @@ import (
 
 func main() {
 	cfg := config.Config{}
-	configPath := ""
+	var (
+		configPath      string
+		graphiQLEnabled bool
+	)
 	flag.StringVar(&configPath, "config", "", "configuration path")
+	flag.BoolVar(&graphiQLEnabled, "graphiql", false, "configuration path")
 	flag.Parse()
 
 	out, err := os.ReadFile(configPath)
@@ -42,5 +51,16 @@ func main() {
 
 	// initialize open_meteo client
 	weatherAPI := open_meteo.NewOpenMeteoClient(cfg.OpenMeteoConfig)
-	_ = usecase.NewUsecase(weatherAPI, db)
+	usecase := usecase.NewUsecase(weatherAPI, db)
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver(usecase)}))
+
+	if graphiQLEnabled {
+		http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	}
+
+	http.Handle("/query", srv)
+
+	log.Printf("running server on port: %s", cfg.ServerConfig.Port)
+	log.Fatal(http.ListenAndServe(":"+cfg.ServerConfig.Port, nil))
 }

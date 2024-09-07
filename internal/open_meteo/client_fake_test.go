@@ -35,7 +35,7 @@ func ServeFakeOpenMeteo(t *testing.T, ctx context.Context) string {
 			}
 		case "/v1/elevation":
 			w.WriteHeader(http.StatusOK)
-			w.Write(responseElevation)
+			w.Write(responseElevations)
 		default:
 			w.WriteHeader(http.StatusNotFound)
 			w.Write(responseNotFound)
@@ -51,7 +51,7 @@ func ServeFakeOpenMeteo(t *testing.T, ctx context.Context) string {
 var (
 	responseNotFound   = []byte(`{"error":true,"reason":"Not Found"}`)
 	responseBadRequest = []byte(`{"error":true,"reason":"Parameter 'latitude' and 'longitude' must have the same number of elements"}`)
-	responseElevation  = []byte(`{"elevation":[38.01]}`)
+	responseElevations = []byte(`{"elevation":[38.01,72.56]}`)
 	responseForecast   = []byte(`
 		{
 			"latitude": 52.52,

@@ -14,7 +14,7 @@ var _ weatherAPI = (*open_meteo.OpenMeteoClient)(nil)
 type weatherAPI interface {
 	GetWeatherForecast(ctx context.Context, latitudes float64, longitudes float64, forecastDays int) (*types.WeatherForecastProperties, error)
 	GetWeatherForecasts(ctx context.Context, latitudes []float64, longitudes []float64, forecastDays int) ([]types.WeatherForecastProperties, error)
-	GetElevation(ctx context.Context, latitude float64, longitude float64) (float64, error)
+	GetElevations(ctx context.Context, latitude []float64, longitude []float64) ([]float64, error)
 }
 
 var _ db = (*database.Database)(nil)
@@ -139,20 +139,21 @@ func (u *Usecase) GetPowerPlant(ctx context.Context, id int64, forecastDays int)
 
 	powerPlant.WeatherForecastProperties = *forecast
 
+	elevations, err := u.weatherAPI.GetElevations(ctx, []float64{powerPlant.Latitude}, []float64{powerPlant.Longitude})
+	if err != nil {
+		return nil, err
+	}
+
+	powerPlant.Elevation = elevations[0]
+
 	return powerPlant, nil
 }
 
 // GetPowerPlants returns a list of power plants.
 // We use lastID to mark the last power plant ID we fetched instead of using offset to avoid performance issues when the table grows.
-// We also limit the number of power plants to fetch to 10 by default so we don't fetch too many records at once.
 func (u *Usecase) GetPowerPlants(ctx context.Context, lastID int64, count int, forecastDays int) ([]types.PowerPlant, error) {
 	if _, ok := types.ValidForecastLengths[forecastDays]; !ok {
 		return nil, types.NewError("invalid forecast days").WithCode(types.ErrBadRequest)
-	}
-
-	// set default count to 10 if not provided by the user
-	if count == 0 {
-		count = 10
 	}
 
 	powerPlants, err := u.db.GetPowerPlants(ctx, lastID, count)
@@ -172,8 +173,14 @@ func (u *Usecase) GetPowerPlants(ctx context.Context, lastID int64, count int, f
 		return nil, err
 	}
 
+	elevations, err := u.weatherAPI.GetElevations(ctx, lats, longs)
+	if err != nil {
+		return nil, err
+	}
+
 	for i, forecast := range forecasts {
 		powerPlants[i].WeatherForecastProperties = forecast
+		powerPlants[i].Elevation = elevations[i]
 	}
 
 	return powerPlants, nil

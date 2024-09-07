@@ -111,23 +111,29 @@ func (c *OpenMeteoClient) GetWeatherForecasts(ctx context.Context, latitudes []f
 
 // GetElevation returns the elevation for the given latitude and longitude.
 // Docs: https://open-meteo.com/en/docs/elevation-api
-func (c *OpenMeteoClient) GetElevation(ctx context.Context, latitude float64, longitude float64) (float64, error) {
+func (c *OpenMeteoClient) GetElevations(ctx context.Context, latitudes []float64, longitudes []float64) ([]float64, error) {
+	latsStr := make([]string, 0, len(latitudes))
+	for _, lat := range latitudes {
+		latsStr = append(latsStr, fmt.Sprint(lat))
+	}
+
+	longsStr := make([]string, 0, len(longitudes))
+	for _, long := range longitudes {
+		longsStr = append(longsStr, fmt.Sprint(long))
+	}
+
 	query := url.Values{
-		"latitude":  {fmt.Sprint(latitude)},
-		"longitude": {fmt.Sprint(longitude)},
+		"latitude":  latsStr,
+		"longitude": longsStr,
 	}
 
 	var elevation Elevation
 	err := c.doRequest("/v1/elevation", query, "GET", nil, &elevation)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	if len(elevation.Elevation) != 1 {
-		return 0, fmt.Errorf("unexpected number of elevations: %d", len(elevation.Elevation))
-	}
-
-	return elevation.Elevation[0], nil
+	return elevation.Elevation, nil
 }
 
 // doRequest performs a request to the OpenMeteo API.
