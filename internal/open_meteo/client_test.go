@@ -212,21 +212,20 @@ func TestOpenMeteoClient_GetElevations(t *testing.T) {
 		lat      []float64
 		long     []float64
 		err      error
-		expected float64
+		expected []float64
 	}{
 		{
-			name:     "failed, bad request",
-			lat:      []float64{200.1},
-			long:     []float64{200.1},
-			err:      errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
-			expected: 0,
+			name: "failed, bad request",
+			lat:  []float64{200.1},
+			long: []float64{200.1},
+			err:  errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
 		},
 		{
 			name:     "success",
 			lat:      []float64{47.36865, 72.580003},
 			long:     []float64{8.539183, 23.0333},
 			err:      nil,
-			expected: 38.01,
+			expected: []float64{38.01, 72.56},
 		},
 	}
 
@@ -279,7 +278,7 @@ func TestOpenMeteoClient_doRequest(t *testing.T) {
 			err:   nil,
 			value: map[string]any{},
 			expected: map[string]any{
-				"elevation": []any{38.01},
+				"elevation": []any{38.01, 72.56},
 			},
 		},
 	}
