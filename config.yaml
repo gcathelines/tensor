@@ -1,0 +1,11 @@
+db:
+  host: localhost
+  port: 5432
+  username: user
+  password: pass
+  dbname: testdb
+  dsn: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+
+openmeteo:
+  api_url: https://api.open-meteo.com
+  timeout: 15s
