@@ -37,5 +37,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println("migration done")
+	log.Printf("migration %s done\n", path)
 }

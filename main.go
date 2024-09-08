@@ -26,7 +26,7 @@ func main() {
 		graphiQLEnabled bool
 	)
 	flag.StringVar(&configPath, "config", "", "configuration path")
-	flag.BoolVar(&graphiQLEnabled, "graphiql", false, "configuration path")
+	flag.BoolVar(&graphiQLEnabled, "graphiql", false, "enable graphiql")
 	flag.Parse()
 
 	out, err := os.ReadFile(configPath)
