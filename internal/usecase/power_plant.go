@@ -23,6 +23,7 @@ type db interface {
 	CreatePowerPlant(ctx context.Context, powerPlant *types.PowerPlant) (*types.PowerPlant, error)
 	UpdatePowerPlant(ctx context.Context, powerPlant *types.PowerPlant) (*types.PowerPlant, error)
 	GetPowerPlant(ctx context.Context, id int64) (*types.PowerPlant, error)
+	GetPowerPlantForUpdate(ctx context.Context, id int64) (*types.PowerPlant, error)
 	GetPowerPlants(ctx context.Context, lastID int64, count int) ([]types.PowerPlant, error)
 }
 
@@ -65,44 +66,45 @@ func (u *Usecase) CreatePowerPlant(ctx context.Context, name string, lat float64
 	})
 }
 
-// UpdatePowerPlant updates a power plant by ID and version.
-// We use version as an optimistic lock to avoid writing conflicts.
-// Suppose other write already update the version, the client need to re-fetch the data
-// and try to update it again using the new version.
-func (u *Usecase) UpdatePowerPlant(ctx context.Context, id int64, version int64, name string, lat float64, long float64) (*types.PowerPlant, error) {
+// UpdatePowerPlant updates a power plant by ID.
+// We will use pessimistic lock to avoid write conflicts.
+func (u *Usecase) UpdatePowerPlant(ctx context.Context, id int64, name *string, lat *float64, long *float64) (*types.PowerPlant, error) {
 	if id == 0 {
 		return nil, types.NewError("id is required").WithCode(types.ErrBadRequest)
 	}
-	if version == 0 {
-		return nil, types.NewError("version is required").WithCode(types.ErrBadRequest)
-	}
-	if name == "" {
-		return nil, types.NewError("name is required").WithCode(types.ErrBadRequest)
-	}
-	if lat == 0 {
-		return nil, types.NewError("latitude is required").WithCode(types.ErrBadRequest)
-	}
-	if long == 0 {
-		return nil, types.NewError("longitude is required").WithCode(types.ErrBadRequest)
-	}
-	if lat > 90 || lat < -90 {
+	if lat != nil && (*lat > 90 || *lat < -90) {
 		return nil, types.NewError("latitude must be between -90 and 90").WithCode(types.ErrBadRequest)
 	}
-	if long > 180 || long < -180 {
+	if long != nil && (*long > 180 || *long < -180) {
 		return nil, types.NewError("longitude must be between -180 and 180").WithCode(types.ErrBadRequest)
 	}
 
-	powerPlant, err := u.db.UpdatePowerPlant(ctx, &types.PowerPlant{
-		ID:        id,
-		Name:      name,
-		Latitude:  lat,
-		Longitude: long,
-		Version:   version,
-	})
+	powerPlant, err := u.db.GetPowerPlantForUpdate(ctx, id)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return nil, types.NewError("id/version pair not found").WithCode(types.ErrBadRequest)
+			return nil, types.NewError("id not found").WithCode(types.ErrBadRequest)
+		default:
+			// TODO: unhandled error should be logged as we're not passing the error to UI
+			return nil, err
+		}
+	}
+
+	if lat != nil {
+		powerPlant.Latitude = *lat
+	}
+	if long != nil {
+		powerPlant.Longitude = *long
+	}
+	if name != nil {
+		powerPlant.Name = *name
+	}
+
+	powerPlant, err = u.db.UpdatePowerPlant(ctx, powerPlant)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, types.NewError("id not found").WithCode(types.ErrBadRequest)
 		default:
 			// TODO: unhandled error should be logged as we're not passing the error to UI
 			return nil, err

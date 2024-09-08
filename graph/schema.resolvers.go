@@ -17,7 +17,7 @@ func (r *mutationResolver) CreatePowerPlant(ctx context.Context, input CreatePow
 
 // UpdatePowerPlant is the resolver for the updatePowerPlant field.
 func (r *mutationResolver) UpdatePowerPlant(ctx context.Context, input UpdatePowerPlantInput) (*types.PowerPlant, error) {
-	return r.usecase.UpdatePowerPlant(ctx, input.ID, input.Version, input.Name, input.Latitude, input.Longitude)
+	return r.usecase.UpdatePowerPlant(ctx, input.ID, input.Name, input.Latitude, input.Longitude)
 }
 
 // PowerPlant is the resolver for the powerPlant field.

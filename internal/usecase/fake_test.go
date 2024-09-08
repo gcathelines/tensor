@@ -95,11 +95,10 @@ func (f *fakeDB) CreatePowerPlant(ctx context.Context, powerPlant *types.PowerPl
 }
 
 func (f *fakeDB) UpdatePowerPlant(ctx context.Context, powerPlant *types.PowerPlant) (*types.PowerPlant, error) {
-	if powerPlant.Version == 999 {
+	if powerPlant.ID == 999 {
 		return nil, sql.ErrNoRows
 	}
 	powerPlant.UpdatedAt = time.Now()
-	powerPlant.Version = powerPlant.Version + 1
 	return powerPlant, nil
 }
 
@@ -112,7 +111,20 @@ func (f *fakeDB) GetPowerPlant(ctx context.Context, id int64) (*types.PowerPlant
 		Name:      "My Cool Power Plant",
 		Latitude:  22.11,
 		Longitude: 33.11,
-		Version:   2,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}, nil
+}
+
+func (f *fakeDB) GetPowerPlantForUpdate(ctx context.Context, id int64) (*types.PowerPlant, error) {
+	if id == 999 {
+		return nil, sql.ErrNoRows
+	}
+	return &types.PowerPlant{
+		ID:        id,
+		Name:      "My Cool Power Plant",
+		Latitude:  22.11,
+		Longitude: 33.11,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}, nil
@@ -126,7 +138,6 @@ func (f *fakeDB) GetPowerPlants(ctx context.Context, lastID int64, count int) ([
 			Name:      fmt.Sprintf("My Cool Power Plant %d", i),
 			Latitude:  0.22 + float64(i*10),
 			Longitude: 0.44 + float64(i*10),
-			Version:   i,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		})

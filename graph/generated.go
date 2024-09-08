@@ -59,7 +59,6 @@ type ComplexityRoot struct {
 		Latitude              func(childComplexity int) int
 		Longitude             func(childComplexity int) int
 		Name                  func(childComplexity int) int
-		Version               func(childComplexity int) int
 		WeatherForecasts      func(childComplexity int, forecastDays *int) int
 	}
 
@@ -170,13 +169,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PowerPlant.Name(childComplexity), true
-
-	case "PowerPlant.version":
-		if e.complexity.PowerPlant.Version == nil {
-			break
-		}
-
-		return e.complexity.PowerPlant.Version(childComplexity), true
 
 	case "PowerPlant.weatherForecasts":
 		if e.complexity.PowerPlant.WeatherForecasts == nil {
@@ -583,8 +575,6 @@ func (ec *executionContext) fieldContext_Mutation_createPowerPlant(ctx context.C
 				return ec.fieldContext_PowerPlant_hasPrecipitationToday(ctx, field)
 			case "elevation":
 				return ec.fieldContext_PowerPlant_elevation(ctx, field)
-			case "version":
-				return ec.fieldContext_PowerPlant_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PowerPlant", field.Name)
 		},
@@ -656,8 +646,6 @@ func (ec *executionContext) fieldContext_Mutation_updatePowerPlant(ctx context.C
 				return ec.fieldContext_PowerPlant_hasPrecipitationToday(ctx, field)
 			case "elevation":
 				return ec.fieldContext_PowerPlant_elevation(ctx, field)
-			case "version":
-				return ec.fieldContext_PowerPlant_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PowerPlant", field.Name)
 		},
@@ -1007,50 +995,6 @@ func (ec *executionContext) fieldContext_PowerPlant_elevation(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _PowerPlant_version(ctx context.Context, field graphql.CollectedField, obj *types.PowerPlant) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PowerPlant_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int64)
-	fc.Result = res
-	return ec.marshalNInt642int64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_PowerPlant_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "PowerPlant",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int64 does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_powerPlant(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_powerPlant(ctx, field)
 	if err != nil {
@@ -1101,8 +1045,6 @@ func (ec *executionContext) fieldContext_Query_powerPlant(ctx context.Context, f
 				return ec.fieldContext_PowerPlant_hasPrecipitationToday(ctx, field)
 			case "elevation":
 				return ec.fieldContext_PowerPlant_elevation(ctx, field)
-			case "version":
-				return ec.fieldContext_PowerPlant_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PowerPlant", field.Name)
 		},
@@ -1174,8 +1116,6 @@ func (ec *executionContext) fieldContext_Query_powerPlants(ctx context.Context, 
 				return ec.fieldContext_PowerPlant_hasPrecipitationToday(ctx, field)
 			case "elevation":
 				return ec.fieldContext_PowerPlant_elevation(ctx, field)
-			case "version":
-				return ec.fieldContext_PowerPlant_version(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PowerPlant", field.Name)
 		},
@@ -3364,7 +3304,7 @@ func (ec *executionContext) unmarshalInputUpdatePowerPlantInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "version", "name", "latitude", "longitude"}
+	fieldsInOrder := [...]string{"id", "name", "latitude", "longitude"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3378,30 +3318,23 @@ func (ec *executionContext) unmarshalInputUpdatePowerPlantInput(ctx context.Cont
 				return it, err
 			}
 			it.ID = data
-		case "version":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("version"))
-			data, err := ec.unmarshalNInt642int64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Version = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Name = data
 		case "latitude":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("latitude"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Latitude = data
 		case "longitude":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("longitude"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3519,11 +3452,6 @@ func (ec *executionContext) _PowerPlant(ctx context.Context, sel ast.SelectionSe
 			}
 		case "elevation":
 			out.Values[i] = ec._PowerPlant_elevation(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "version":
-			out.Values[i] = ec._PowerPlant_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4076,21 +4004,6 @@ func (ec *executionContext) marshalNID2int64(ctx context.Context, sel ast.Select
 	return res
 }
 
-func (ec *executionContext) unmarshalNInt642int64(ctx context.Context, v interface{}) (int64, error) {
-	res, err := graphql.UnmarshalInt64(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNInt642int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
-	res := graphql.MarshalInt64(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) marshalNPowerPlant2githubᚗcomᚋgcathelinesᚋtensorᚑenergyᚑcaseᚋinternalᚋtypesᚐPowerPlant(ctx context.Context, sel ast.SelectionSet, v types.PowerPlant) graphql.Marshaler {
 	return ec._PowerPlant(ctx, sel, &v)
 }
@@ -4494,6 +4407,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

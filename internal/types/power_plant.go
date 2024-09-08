@@ -17,7 +17,6 @@ type PowerPlant struct {
 	Name      string    `json:"name"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
-	Version   int64     `json:"version"`
 	Elevation float64   `json:"elevation"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`

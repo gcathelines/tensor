@@ -90,7 +90,6 @@ func TestUsecase_UpdatePowerPlant(t *testing.T) {
 		lat      float64
 		long     float64
 		id       int64
-		version  int64
 		err      error
 	}{
 		{
@@ -99,56 +98,21 @@ func TestUsecase_UpdatePowerPlant(t *testing.T) {
 			lat:      1.1,
 			long:     2.2,
 			id:       1,
-			version:  1,
 		},
 		{
 			testName: "failed, invalid id",
 			name:     "My Cool Power Plant",
 			lat:      1.1,
 			long:     2.2,
-			version:  999,
-			id:       1,
-			err:      errors.New("id/version pair not found"),
+			id:       999,
+			err:      errors.New("id not found"),
 		},
 		{
 			testName: "failed, empty id",
 			name:     "My Cool Power Plant",
 			lat:      1.1,
 			long:     2.2,
-			version:  1,
 			err:      errors.New("id is required"),
-		},
-		{
-			testName: "failed, empty version",
-			name:     "My Cool Power Plant",
-			lat:      1.1,
-			long:     2.2,
-			id:       1,
-			err:      errors.New("version is required"),
-		},
-		{
-			testName: "failed, empty name",
-			lat:      1.1,
-			long:     2.2,
-			id:       1,
-			version:  1,
-			err:      errors.New("name is required"),
-		},
-		{
-			testName: "failed, empty latitude",
-			name:     "My Cool Power Plant",
-			long:     2.2,
-			id:       1,
-			version:  1,
-			err:      errors.New("latitude is required"),
-		},
-		{
-			testName: "failed, empty longitude",
-			name:     "My Cool Power Plant",
-			lat:      1.1,
-			id:       1,
-			version:  1,
-			err:      errors.New("longitude is required"),
 		},
 		{
 			testName: "failed, invalid latitude",
@@ -156,7 +120,6 @@ func TestUsecase_UpdatePowerPlant(t *testing.T) {
 			lat:      91.1,
 			long:     2.2,
 			id:       1,
-			version:  1,
 			err:      errors.New("latitude must be between -90 and 90"),
 		},
 		{
@@ -165,14 +128,13 @@ func TestUsecase_UpdatePowerPlant(t *testing.T) {
 			lat:      11.1,
 			long:     181.2,
 			id:       1,
-			version:  1,
 			err:      errors.New("longitude must be between -180 and 180"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
-			_, err := testUsecase.UpdatePowerPlant(ctx, tt.id, tt.version, tt.name, tt.lat, tt.long)
+			_, err := testUsecase.UpdatePowerPlant(ctx, tt.id, &tt.name, &tt.lat, &tt.long)
 			if tt.err != nil {
 				if err == nil || err.Error() != tt.err.Error() {
 					t.Fatalf("expected error: %v, got: %v", tt.err, err)
@@ -207,7 +169,6 @@ func TestUsecase_GetPowerPlant(t *testing.T) {
 				Name:      "My Cool Power Plant",
 				Latitude:  22.11,
 				Longitude: 33.11,
-				Version:   2,
 				Elevation: 0.6677740863787376,
 				WeatherForecastProperties: types.WeatherForecastProperties{
 					WeatherForecasts: []types.WeatherForecast{
@@ -293,7 +254,6 @@ func TestUsecase_GetPowerPlants(t *testing.T) {
 					Latitude:  10.22,
 					Longitude: 10.44,
 					Elevation: 0.9789272030651343,
-					Version:   1,
 					WeatherForecastProperties: types.WeatherForecastProperties{
 						WeatherForecasts: []types.WeatherForecast{
 							{
@@ -320,7 +280,6 @@ func TestUsecase_GetPowerPlants(t *testing.T) {
 					Latitude:  20.22,
 					Longitude: 20.44,
 					Elevation: 0.9892367906066535,
-					Version:   2,
 					WeatherForecastProperties: types.WeatherForecastProperties{
 						WeatherForecasts: []types.WeatherForecast{
 							{

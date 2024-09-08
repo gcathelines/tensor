@@ -15,8 +15,6 @@ type PowerPlant {
   hasPrecipitationToday: Boolean!
   "Elevation of the power plant"
   elevation: Float!
-  "Latest version of the power plant"
-  version: Int64!
 }
 
 type WeatherForecast {
@@ -44,14 +42,12 @@ input CreatePowerPlantInput {
 input UpdatePowerPlantInput {
   "ID of the power plant"
   id: ID!
-  "Latest version of the power plant"
-  version: Int64!
   "Name of the power plant"
-  name: String!
+  name: String
   "Latitude in degrees"
-  latitude: Float!
+  latitude: Float
   "Longitude in degrees"
-  longitude: Float!
+  longitude: Float
 }
 
 

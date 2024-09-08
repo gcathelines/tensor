@@ -88,7 +88,6 @@ func TestDatabase_CreatePowerPlant(t *testing.T) {
 				Name:      "power plant 1",
 				Latitude:  48.8566,
 				Longitude: 2.3522,
-				Version:   1,
 			},
 		},
 	}
@@ -136,29 +135,12 @@ func TestDatabase_UpdatePowerPlant(t *testing.T) {
 				Name:      "updated pp 1",
 				Latitude:  1.1,
 				Longitude: 2.2,
-				Version:   1,
 			},
 			expected: &types.PowerPlant{
 				Name:      "updated pp 1",
 				Latitude:  1.1,
 				Longitude: 2.2,
-				Version:   2,
 			},
-		},
-		{
-			name: "failed, version mismatch",
-			createdData: &types.PowerPlant{
-				Name:      "power plant 2",
-				Latitude:  48.8566,
-				Longitude: 2.3522,
-			},
-			payload: &types.PowerPlant{
-				Name:      "updated pp 2",
-				Latitude:  1.1,
-				Longitude: 2.2,
-				Version:   2,
-			},
-			err: sql.ErrNoRows,
 		},
 	}
 
@@ -221,7 +203,6 @@ func TestDatabase_GetPowerPlant(t *testing.T) {
 				Name:      "Solar Power Plant",
 				Latitude:  50.8503,
 				Longitude: 4.3517,
-				Version:   1,
 			},
 		},
 		{
@@ -234,6 +215,63 @@ func TestDatabase_GetPowerPlant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			powerPlant, err := testDB.GetPowerPlant(ctx, tt.ID)
+			if tt.err != nil {
+				if err == nil || err.Error() != tt.err.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if diff := cmp.Diff(tt.expected, powerPlant,
+				cmpopts.IgnoreFields(types.PowerPlant{}, "CreatedAt", "UpdatedAt")); diff != "" {
+				t.Fatalf("unexpected power plant (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestDatabase_GetPowerPlantForUpdate(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	powerPlant, err := testDB.CreatePowerPlant(ctx, &types.PowerPlant{
+		Name:      "Solar Power Plant",
+		Latitude:  50.8503,
+		Longitude: 4.3517,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	tests := []struct {
+		name     string
+		ID       int64
+		expected *types.PowerPlant
+		err      error
+	}{
+		{
+			name: "success",
+			ID:   powerPlant.ID,
+			expected: &types.PowerPlant{
+				ID:        powerPlant.ID,
+				Name:      "Solar Power Plant",
+				Latitude:  50.8503,
+				Longitude: 4.3517,
+			},
+		},
+		{
+			name: "not found",
+			ID:   0,
+			err:  sql.ErrNoRows,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			powerPlant, err := testDB.GetPowerPlantForUpdate(ctx, tt.ID)
 			if tt.err != nil {
 				if err == nil || err.Error() != tt.err.Error() {
 					t.Fatalf("expected error: %v, got: %v", tt.err, err)
@@ -280,64 +318,58 @@ func TestDatabase_GetPowerPlants(t *testing.T) {
 	}{
 		{
 			name:   "page 1, count 3",
-			lastID: 100000000,
+			lastID: 0,
 			count:  3,
 			expected: []types.PowerPlant{
 				{
-					ID:        100000001,
+					ID:        1,
 					Name:      "Solar Power Plant",
 					Latitude:  40.7128,
 					Longitude: -74.0060,
-					Version:   1,
 				},
 				{
-					ID:        100000002,
+					ID:        2,
 					Name:      "Wind Power Plant",
 					Latitude:  34.0522,
 					Longitude: -118.2437,
-					Version:   1,
 				},
 				{
-					ID:        100000003,
+					ID:        3,
 					Name:      "Hydro Power Plant",
 					Latitude:  37.7749,
 					Longitude: -122.4194,
-					Version:   1,
 				},
 			},
 		},
 		{
 			name:   "page 2, count 2",
-			lastID: 100000003,
+			lastID: 3,
 			count:  2,
 			expected: []types.PowerPlant{
 				{
-					ID:        100000004,
+					ID:        4,
 					Name:      "Solar 2 Power Plant",
 					Latitude:  40.7128,
 					Longitude: -74.0060,
-					Version:   1,
 				},
 				{
-					ID:        100000005,
+					ID:        5,
 					Name:      "Wind 2 Power Plant",
 					Latitude:  34.0522,
 					Longitude: -118.2437,
-					Version:   1,
 				},
 			},
 		},
 		{
 			name:   "page 4, count 3",
-			lastID: 100000009,
+			lastID: 9,
 			count:  3,
 			expected: []types.PowerPlant{
 				{
-					ID:        100000010,
+					ID:        10,
 					Name:      "Last Power Plant",
 					Latitude:  40.7128,
 					Longitude: -74.0060,
-					Version:   1,
 				},
 			},
 		},

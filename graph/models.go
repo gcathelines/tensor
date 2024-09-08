@@ -20,12 +20,10 @@ type Query struct {
 type UpdatePowerPlantInput struct {
 	// ID of the power plant
 	ID int64 `json:"id"`
-	// Latest version of the power plant
-	Version int64 `json:"version"`
 	// Name of the power plant
-	Name string `json:"name"`
+	Name *string `json:"name,omitempty"`
 	// Latitude in degrees
-	Latitude float64 `json:"latitude"`
+	Latitude *float64 `json:"latitude,omitempty"`
 	// Longitude in degrees
-	Longitude float64 `json:"longitude"`
+	Longitude *float64 `json:"longitude,omitempty"`
 }
