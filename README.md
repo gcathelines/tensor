@@ -1,18 +1,12 @@
 
 ## Running the App
-To run the application, follow these steps:
-
-1. Build the app by running the command:
-```shell
-make deps
-```
-
-2. Run the app and the database using the command:
+To run the app and the database, use the following command:
 ```shell
 make run
 ```
+By default GraphiQL is enabled, to disable it update **GRAPHIQL_ENABLED** env in `docker-compose.yaml`.
 
-3. To run the migration for the target database, use the command:
+To run the migration for the target database, use the following command:
 ```shell
 make migrate DSN=your://cool:dns@in:5432/here
 ```
