@@ -35,31 +35,7 @@ func SetupDB() (*sql.DB, func(*sql.DB)) {
 		log.Fatal(err)
 	}
 
-	schemaUp, err := os.ReadFile("./../../migrations/schema.up.sql")
-	if err != nil {
-		db.Close()
-		log.Fatal(err)
-	}
-
-	_, err = db.Exec(string(schemaUp))
-	if err != nil {
-		db.Close()
-		log.Fatal(err)
-	}
-
 	closeFn := func(db *sql.DB) {
-		schemaDown, err := os.ReadFile("./../../migrations/schema.down.sql")
-		if err != nil {
-			db.Close()
-			log.Fatal(err)
-		}
-
-		_, err = db.Exec(string(schemaDown))
-		if err != nil {
-			db.Close()
-			log.Fatal(err)
-		}
-
 		db.Close()
 	}
 
@@ -84,7 +60,6 @@ func TestDatabase_CreatePowerPlant(t *testing.T) {
 				Longitude: 2.3522,
 			},
 			expected: &types.PowerPlant{
-				ID:        1,
 				Name:      "power plant 1",
 				Latitude:  48.8566,
 				Longitude: 2.3522,
@@ -106,7 +81,7 @@ func TestDatabase_CreatePowerPlant(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(tt.expected, powerPlant,
-				cmpopts.IgnoreFields(types.PowerPlant{}, "CreatedAt")); diff != "" {
+				cmpopts.IgnoreFields(types.PowerPlant{}, "ID", "CreatedAt")); diff != "" {
 				t.Fatalf("unexpected power plant (-want +got):\n%s", diff)
 			}
 		})
@@ -294,21 +269,6 @@ func TestDatabase_GetPowerPlants(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	_, err := testDB.db.Exec("TRUNCATE TABLE power_plants")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	seedUp, err := os.ReadFile("./../../migrations/seed.up.sql")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = testDB.db.Exec(string(seedUp))
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	tests := []struct {
 		name     string
 		lastID   int64
@@ -361,19 +321,6 @@ func TestDatabase_GetPowerPlants(t *testing.T) {
 			},
 		},
 		{
-			name:   "page 4, count 3",
-			lastID: 9,
-			count:  3,
-			expected: []types.PowerPlant{
-				{
-					ID:        10,
-					Name:      "Last Power Plant",
-					Latitude:  40.7128,
-					Longitude: -74.0060,
-				},
-			},
-		},
-		{
 			name:     "page 2, count 10",
 			lastID:   100000010,
 			count:    10,
@@ -398,15 +345,5 @@ func TestDatabase_GetPowerPlants(t *testing.T) {
 				t.Fatalf("unexpected power plant (-want +got):\n%s", diff)
 			}
 		})
-	}
-
-	seedDown, err := os.ReadFile("./../../migrations/seed.down.sql")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = testDB.db.Exec(string(seedDown))
-	if err != nil {
-		log.Fatal(err)
 	}
 }

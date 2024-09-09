@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 var (
 	ValidForecastLengths = map[int]struct{}{
@@ -10,6 +13,7 @@ var (
 		14: {},
 		16: {},
 	}
+	ErrInternal = errors.New("internal error")
 )
 
 type PowerPlant struct {
@@ -18,20 +22,20 @@ type PowerPlant struct {
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
 	Elevation float64   `json:"elevation"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	WeatherForecastProperties
 }
 
 type WeatherForecastProperties struct {
-	HasPrecipitationToday bool              `json:"has_precipitation_today"`
-	WeatherForecasts      []WeatherForecast `json:"weather_forecasts"`
+	HasPrecipitationToday bool              `json:"hasPrecipitationToday"`
+	WeatherForecasts      []WeatherForecast `json:"weatherForecasts"`
 }
 
 type WeatherForecast struct {
 	Time          string  `json:"time"`
 	Temperature   float64 `json:"temperature"`
 	Precipitation float64 `json:"precipitation"`
-	WindSpeed     float64 `json:"wind_speed"`
-	WindDirection float64 `json:"wind_direction"`
+	WindSpeed     float64 `json:"windSpeed"`
+	WindDirection float64 `json:"windDirection"`
 }

@@ -10,6 +10,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: testdb
+      POSTGRES_HOST: postgres 
       TZ: GMT
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "testdb"]
@@ -18,6 +19,18 @@ services:
       retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  app:
+    image: tensor-case
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      GRAPHIQL_ENABLED: true
+    depends_on:
+      - postgres
+    restart: unless-stopped
 volumes:
   postgres_data:
 
