@@ -1,15 +1,15 @@
-DSN = "postgres://user:pass@localhost:5432/testdb?sslmode=disable"
-
-deps:
-	docker compose build
+DSN = postgres://user:pass@localhost:5432/testdb?sslmode=disable
 
 run:
-	docker compose up -d --no-build
+	docker compose up -d
+
+stop:
+	docker compose down
 
 test: 
-	docker compose up -d --no-build
+	make run 
 	go test ./... -v
-	docker compose down
+	make stop
 
 migrate: 
 	go run ./migrations/script/migrate.go -path ./migrations/schema.up.sql -dsn $(DSN)
