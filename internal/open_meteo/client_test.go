@@ -22,24 +22,24 @@ func TestOpenMeteoClient_GetWeatherForecast(t *testing.T) {
 	})
 
 	tests := []struct {
-		name     string
-		lat      float64
-		long     float64
-		err      error
-		expected *types.WeatherForecastProperties
+		name      string
+		lat       float64
+		long      float64
+		expectErr error
+		expected  *types.WeatherForecastProperties
 	}{
 		{
-			name:     "failed, bad request",
-			lat:      200.1,
-			long:     200.1,
-			err:      errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
-			expected: nil,
+			name:      "failed, bad request",
+			lat:       200.1,
+			long:      200.1,
+			expectErr: errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
+			expected:  nil,
 		},
 		{
-			name: "success",
-			lat:  52.52,
-			long: 13.41,
-			err:  nil,
+			name:      "success",
+			lat:       52.52,
+			long:      13.41,
+			expectErr: nil,
 			expected: &types.WeatherForecastProperties{
 				HasPrecipitationToday: false,
 				WeatherForecasts: []types.WeatherForecast{
@@ -72,9 +72,9 @@ func TestOpenMeteoClient_GetWeatherForecast(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := cl.GetWeatherForecast(ctx, tt.lat, tt.long, 7)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -101,24 +101,23 @@ func TestOpenMeteoClient_GetWeatherForecasts(t *testing.T) {
 	})
 
 	tests := []struct {
-		name     string
-		lats     []float64
-		longs    []float64
-		err      error
-		expected []types.WeatherForecastProperties
+		name      string
+		lats      []float64
+		longs     []float64
+		expectErr error
+		expected  []types.WeatherForecastProperties
 	}{
 		{
-			name:     "failed, bad request",
-			lats:     []float64{200.1},
-			longs:    []float64{200.1},
-			err:      errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
-			expected: nil,
+			name:      "failed, bad request",
+			lats:      []float64{200.1},
+			longs:     []float64{200.1},
+			expectErr: errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
+			expected:  nil,
 		},
 		{
 			name:  "success",
 			lats:  []float64{52.52, 71.55},
 			longs: []float64{13.419998, 62.01},
-			err:   nil,
 			expected: []types.WeatherForecastProperties{
 				{
 					HasPrecipitationToday: true,
@@ -179,9 +178,9 @@ func TestOpenMeteoClient_GetWeatherForecasts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := cl.GetWeatherForecasts(ctx, tt.lats, tt.longs, 7)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -208,33 +207,33 @@ func TestOpenMeteoClient_GetElevations(t *testing.T) {
 	})
 
 	tests := []struct {
-		name     string
-		lat      []float64
-		long     []float64
-		err      error
-		expected []float64
+		name      string
+		lat       []float64
+		long      []float64
+		expectErr error
+		expected  []float64
 	}{
 		{
-			name: "failed, bad request",
-			lat:  []float64{200.1},
-			long: []float64{200.1},
-			err:  errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
+			name:      "failed, bad request",
+			lat:       []float64{200.1},
+			long:      []float64{200.1},
+			expectErr: errors.New("unexpected status code: 400, reason: Parameter 'latitude' and 'longitude' must have the same number of elements"),
 		},
 		{
-			name:     "success",
-			lat:      []float64{47.36865, 72.580003},
-			long:     []float64{8.539183, 23.0333},
-			err:      nil,
-			expected: []float64{38.01, 72.56},
+			name:      "success",
+			lat:       []float64{47.36865, 72.580003},
+			long:      []float64{8.539183, 23.0333},
+			expectErr: nil,
+			expected:  []float64{38.01, 72.56},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := cl.GetElevations(ctx, tt.lat, tt.long)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -261,22 +260,22 @@ func TestOpenMeteoClient_doRequest(t *testing.T) {
 	})
 
 	tests := []struct {
-		name     string
-		path     string
-		err      error
-		value    any
-		expected any
+		name      string
+		path      string
+		expectErr error
+		value     any
+		expected  any
 	}{
 		{
-			name: "failed, not found",
-			path: "/v1/unknown",
-			err:  errors.New("unexpected status code: 404, reason: Not Found"),
+			name:      "failed, not found",
+			path:      "/v1/unknown",
+			expectErr: errors.New("unexpected status code: 404, reason: Not Found"),
 		},
 		{
-			name:  "success",
-			path:  "/v1/elevation",
-			err:   nil,
-			value: map[string]any{},
+			name:      "success",
+			path:      "/v1/elevation",
+			expectErr: nil,
+			value:     map[string]any{},
 			expected: map[string]any{
 				"elevation": []any{38.01, 72.56},
 			},
@@ -286,9 +285,9 @@ func TestOpenMeteoClient_doRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := cl.doRequest(tt.path, nil, "GET", nil, &tt.value)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}

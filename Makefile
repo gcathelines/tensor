@@ -7,9 +7,9 @@ stop:
 	docker compose down
 
 test: 
-	make run 
+	@make run 
 	go test ./... -v
-	make stop
+	@make stop
 
 migrate: 
 	go run ./migrations/script/migrate.go -path ./migrations/schema.up.sql -dsn $(DSN)

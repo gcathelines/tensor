@@ -47,10 +47,10 @@ func TestDatabase_CreatePowerPlant(t *testing.T) {
 	defer cancel()
 
 	tests := []struct {
-		name     string
-		payload  *types.PowerPlant
-		expected *types.PowerPlant
-		err      error
+		name      string
+		payload   *types.PowerPlant
+		expected  *types.PowerPlant
+		expectErr error
 	}{
 		{
 			name: "success",
@@ -70,9 +70,9 @@ func TestDatabase_CreatePowerPlant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			powerPlant, err := testDB.CreatePowerPlant(ctx, tt.payload)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -97,7 +97,7 @@ func TestDatabase_UpdatePowerPlant(t *testing.T) {
 		createdData *types.PowerPlant
 		payload     *types.PowerPlant
 		expected    *types.PowerPlant
-		err         error
+		expectErr   error
 	}{
 		{
 			name: "success",
@@ -129,9 +129,9 @@ func TestDatabase_UpdatePowerPlant(t *testing.T) {
 			tt.payload.ID = createdPowerPlant.ID
 
 			powerPlant, err := testDB.UpdatePowerPlant(ctx, tt.payload)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -165,10 +165,10 @@ func TestDatabase_GetPowerPlant(t *testing.T) {
 	}
 
 	tests := []struct {
-		name     string
-		ID       int64
-		expected *types.PowerPlant
-		err      error
+		name      string
+		ID        int64
+		expected  *types.PowerPlant
+		expectErr error
 	}{
 		{
 			name: "success",
@@ -181,18 +181,18 @@ func TestDatabase_GetPowerPlant(t *testing.T) {
 			},
 		},
 		{
-			name: "not found",
-			ID:   0,
-			err:  sql.ErrNoRows,
+			name:      "not found",
+			ID:        0,
+			expectErr: sql.ErrNoRows,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			powerPlant, err := testDB.GetPowerPlant(ctx, tt.ID)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -222,10 +222,10 @@ func TestDatabase_GetPowerPlantForUpdate(t *testing.T) {
 	}
 
 	tests := []struct {
-		name     string
-		ID       int64
-		expected *types.PowerPlant
-		err      error
+		name      string
+		ID        int64
+		expected  *types.PowerPlant
+		expectErr error
 	}{
 		{
 			name: "success",
@@ -238,18 +238,18 @@ func TestDatabase_GetPowerPlantForUpdate(t *testing.T) {
 			},
 		},
 		{
-			name: "not found",
-			ID:   0,
-			err:  sql.ErrNoRows,
+			name:      "not found",
+			ID:        0,
+			expectErr: sql.ErrNoRows,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			powerPlant, err := testDB.GetPowerPlantForUpdate(ctx, tt.ID)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -270,11 +270,11 @@ func TestDatabase_GetPowerPlants(t *testing.T) {
 	defer cancel()
 
 	tests := []struct {
-		name     string
-		lastID   int64
-		count    int
-		expected []types.PowerPlant
-		err      error
+		name      string
+		lastID    int64
+		count     int
+		expected  []types.PowerPlant
+		expectErr error
 	}{
 		{
 			name:   "page 1, count 3",
@@ -331,9 +331,9 @@ func TestDatabase_GetPowerPlants(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			powerPlant, err := testDB.GetPowerPlants(ctx, tt.lastID, tt.count)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}

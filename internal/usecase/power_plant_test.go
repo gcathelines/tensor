@@ -16,11 +16,11 @@ func TestUsecase_CreatePowerPlant(t *testing.T) {
 	defer cancel()
 
 	tests := []struct {
-		testName string
-		name     string
-		lat      float64
-		long     float64
-		err      error
+		testName  string
+		name      string
+		lat       float64
+		long      float64
+		expectErr error
 	}{
 		{
 			testName: "success",
@@ -29,45 +29,45 @@ func TestUsecase_CreatePowerPlant(t *testing.T) {
 			long:     2.2,
 		},
 		{
-			testName: "failed, empty name",
-			lat:      1.1,
-			long:     2.2,
-			err:      errors.New("name is required"),
+			testName:  "failed, empty name",
+			lat:       1.1,
+			long:      2.2,
+			expectErr: errors.New("name is required"),
 		},
 		{
-			testName: "failed, empty latitude",
-			name:     "My Cool Power Plant",
-			long:     2.2,
-			err:      errors.New("latitude is required"),
+			testName:  "failed, empty latitude",
+			name:      "My Cool Power Plant",
+			long:      2.2,
+			expectErr: errors.New("latitude is required"),
 		},
 		{
-			testName: "failed, empty longitude",
-			name:     "My Cool Power Plant",
-			lat:      1.1,
-			err:      errors.New("longitude is required"),
+			testName:  "failed, empty longitude",
+			name:      "My Cool Power Plant",
+			lat:       1.1,
+			expectErr: errors.New("longitude is required"),
 		},
 		{
-			testName: "failed, invalid latitude",
-			name:     "My Cool Power Plant",
-			lat:      91.1,
-			long:     2.2,
-			err:      errors.New("latitude must be between -90 and 90"),
+			testName:  "failed, invalid latitude",
+			name:      "My Cool Power Plant",
+			lat:       91.1,
+			long:      2.2,
+			expectErr: types.ErrInvalidLatitude,
 		},
 		{
-			testName: "failed, invalid longitude",
-			name:     "My Cool Power Plant",
-			lat:      11.1,
-			long:     181.2,
-			err:      errors.New("longitude must be between -180 and 180"),
+			testName:  "failed, invalid longitude",
+			name:      "My Cool Power Plant",
+			lat:       11.1,
+			long:      181.2,
+			expectErr: types.ErrInvalidLongitude,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
 			_, err := testUsecase.CreatePowerPlant(ctx, tt.name, tt.lat, tt.long)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -85,12 +85,12 @@ func TestUsecase_UpdatePowerPlant(t *testing.T) {
 	defer cancel()
 
 	tests := []struct {
-		testName string
-		name     string
-		lat      float64
-		long     float64
-		id       int64
-		err      error
+		testName  string
+		name      string
+		lat       float64
+		long      float64
+		id        int64
+		expectErr error
 	}{
 		{
 			testName: "success",
@@ -100,44 +100,44 @@ func TestUsecase_UpdatePowerPlant(t *testing.T) {
 			id:       1,
 		},
 		{
-			testName: "failed, invalid id",
-			name:     "My Cool Power Plant",
-			lat:      1.1,
-			long:     2.2,
-			id:       999,
-			err:      errors.New("id not found"),
+			testName:  "failed, invalid id",
+			name:      "My Cool Power Plant",
+			lat:       1.1,
+			long:      2.2,
+			id:        999,
+			expectErr: errors.New("id not found"),
 		},
 		{
-			testName: "failed, empty id",
-			name:     "My Cool Power Plant",
-			lat:      1.1,
-			long:     2.2,
-			err:      errors.New("id is required"),
+			testName:  "failed, empty id",
+			name:      "My Cool Power Plant",
+			lat:       1.1,
+			long:      2.2,
+			expectErr: errors.New("id is required"),
 		},
 		{
-			testName: "failed, invalid latitude",
-			name:     "My Cool Power Plant",
-			lat:      91.1,
-			long:     2.2,
-			id:       1,
-			err:      errors.New("latitude must be between -90 and 90"),
+			testName:  "failed, invalid latitude",
+			name:      "My Cool Power Plant",
+			lat:       91.1,
+			long:      2.2,
+			id:        1,
+			expectErr: types.ErrInvalidLatitude,
 		},
 		{
-			testName: "failed, invalid longitude",
-			name:     "My Cool Power Plant",
-			lat:      11.1,
-			long:     181.2,
-			id:       1,
-			err:      errors.New("longitude must be between -180 and 180"),
+			testName:  "failed, invalid longitude",
+			name:      "My Cool Power Plant",
+			lat:       11.1,
+			long:      181.2,
+			id:        1,
+			expectErr: types.ErrInvalidLongitude,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
 			_, err := testUsecase.UpdatePowerPlant(ctx, tt.id, &tt.name, &tt.lat, &tt.long)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -158,7 +158,7 @@ func TestUsecase_GetPowerPlant(t *testing.T) {
 		id           int64
 		forecastDays int
 		expected     *types.PowerPlant
-		err          error
+		expectErr    error
 	}{
 		{
 			testName:     "success",
@@ -192,29 +192,29 @@ func TestUsecase_GetPowerPlant(t *testing.T) {
 			},
 		},
 		{
-			testName: "failed, empty id",
-			err:      errors.New("id is required"),
+			testName:  "failed, empty id",
+			expectErr: errors.New("id is required"),
 		},
 		{
 			testName:     "failed, invalid id",
 			id:           999,
 			forecastDays: 7,
-			err:          errors.New("id not found"),
+			expectErr:    errors.New("id not found"),
 		},
 		{
 			testName:     "failed, invalid forecast days",
 			id:           1,
 			forecastDays: 8,
-			err:          errors.New("invalid forecast days"),
+			expectErr:    types.ErrInvalidForecastDay,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
 			powerPlant, err := testUsecase.GetPowerPlant(ctx, tt.id, tt.forecastDays)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -240,7 +240,7 @@ func TestUsecase_GetPowerPlants(t *testing.T) {
 		count        int
 		forecastDays int
 		expected     []types.PowerPlant
-		err          error
+		expectErr    error
 	}{
 		{
 			testName:     "success",
@@ -306,16 +306,16 @@ func TestUsecase_GetPowerPlants(t *testing.T) {
 			testName:     "failed, invalid forecast days",
 			lastID:       1,
 			forecastDays: 8,
-			err:          errors.New("invalid forecast days"),
+			expectErr:    types.ErrInvalidForecastDay,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
 			powerPlants, err := testUsecase.GetPowerPlants(ctx, tt.lastID, tt.count, tt.forecastDays)
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}

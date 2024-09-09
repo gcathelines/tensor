@@ -57,6 +57,7 @@ type DailyData struct {
 	PrecipitationSum []float64 `json:"precipitation_sum"`
 }
 
+// ToWeatherForecasts converts the HourlyData to WeatherForecasts.
 func (d HourlyData) ToWeatherForecasts() ([]types.WeatherForecast, error) {
 	dataCount := len(d.Time)
 	if len(d.Temperature) != dataCount ||
@@ -81,6 +82,7 @@ func (d HourlyData) ToWeatherForecasts() ([]types.WeatherForecast, error) {
 	return forecasts, nil
 }
 
+// HasPrecipitationToday returns true if there is precipitation today.
 func (d DailyData) HasPrecipitationToday() (bool, error) {
 	if len(d.Time) != len(d.PrecipitationSum) || len(d.Time) == 0 {
 		msg := fmt.Sprintf("invalid data length time %d, precipitation %d",

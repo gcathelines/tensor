@@ -13,7 +13,10 @@ var (
 		14: {},
 		16: {},
 	}
-	ErrInternal = errors.New("internal error")
+	ErrInternal           = errors.New("internal error")
+	ErrInvalidLatitude    = errors.New("latitude must be between -90 and 90")
+	ErrInvalidLongitude   = errors.New("longitude must be between -180 and 180")
+	ErrInvalidForecastDay = errors.New("invalid forecast day")
 )
 
 type PowerPlant struct {

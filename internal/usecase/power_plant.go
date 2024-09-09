@@ -29,14 +29,14 @@ type db interface {
 	GetPowerPlants(ctx context.Context, lastID int64, count int) ([]types.PowerPlant, error)
 }
 
-// Usecase ...
+// Usecase represents the usecase of the service.
 type Usecase struct {
 	weatherAPI weatherAPI
 	db         db
 	logger     *log.Logger
 }
 
-// NewUsecase ...
+// NewUsecase creates a new usecase.
 func NewUsecase(weatherAPI weatherAPI, db db) *Usecase {
 
 	return &Usecase{
@@ -58,10 +58,10 @@ func (u *Usecase) CreatePowerPlant(ctx context.Context, name string, lat float64
 		return nil, errors.New("longitude is required")
 	}
 	if lat > 90 || lat < -90 {
-		return nil, errors.New("latitude must be between -90 and 90")
+		return nil, types.ErrInvalidLatitude
 	}
 	if long > 180 || long < -180 {
-		return nil, errors.New("longitude must be between -180 and 180")
+		return nil, types.ErrInvalidLongitude
 	}
 
 	return u.db.CreatePowerPlant(ctx, &types.PowerPlant{
@@ -78,10 +78,10 @@ func (u *Usecase) UpdatePowerPlant(ctx context.Context, id int64, name *string, 
 		return nil, errors.New("id is required")
 	}
 	if lat != nil && (*lat > 90 || *lat < -90) {
-		return nil, errors.New("latitude must be between -90 and 90")
+		return nil, types.ErrInvalidLatitude
 	}
 	if long != nil && (*long > 180 || *long < -180) {
-		return nil, errors.New("longitude must be between -180 and 180")
+		return nil, types.ErrInvalidLongitude
 	}
 
 	powerPlant, err := u.db.GetPowerPlantForUpdate(ctx, id)
@@ -125,7 +125,7 @@ func (u *Usecase) GetPowerPlant(ctx context.Context, id int64, forecastDays int)
 	}
 
 	if _, ok := types.ValidForecastLengths[forecastDays]; !ok {
-		return nil, errors.New("invalid forecast days")
+		return nil, types.ErrInvalidForecastDay
 	}
 
 	powerPlant, err := u.db.GetPowerPlant(ctx, id)
@@ -162,7 +162,7 @@ func (u *Usecase) GetPowerPlant(ctx context.Context, id int64, forecastDays int)
 // We use lastID to mark the last power plant ID we fetched instead of using offset to avoid performance issues when the table grows.
 func (u *Usecase) GetPowerPlants(ctx context.Context, lastID int64, count int, forecastDays int) ([]types.PowerPlant, error) {
 	if _, ok := types.ValidForecastLengths[forecastDays]; !ok {
-		return nil, errors.New("invalid forecast days")
+		return nil, types.ErrInvalidForecastDay
 	}
 
 	powerPlants, err := u.db.GetPowerPlants(ctx, lastID, count)

@@ -10,10 +10,10 @@ import (
 
 func TestHourlyData_ToWeatherForecast(t *testing.T) {
 	tests := []struct {
-		name     string
-		data     HourlyData
-		expected []types.WeatherForecast
-		err      error
+		name      string
+		data      HourlyData
+		expected  []types.WeatherForecast
+		expectErr error
 	}{
 		{
 			name: "failed, invalid data count",
@@ -24,7 +24,7 @@ func TestHourlyData_ToWeatherForecast(t *testing.T) {
 				WindSpeed:     []float64{},
 				WindDirection: []float64{},
 			},
-			err: errors.New("invalid data length, time 1, temp 1, precipitation 2, wind speed 0, wind direction 0"),
+			expectErr: errors.New("invalid data length, time 1, temp 1, precipitation 2, wind speed 0, wind direction 0"),
 		},
 		{
 			name: "success",
@@ -57,9 +57,9 @@ func TestHourlyData_ToWeatherForecast(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			forecasts, err := tt.data.ToWeatherForecasts()
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
@@ -77,10 +77,10 @@ func TestHourlyData_ToWeatherForecast(t *testing.T) {
 
 func TestDailyData_HasPrecipitationToday(t *testing.T) {
 	tests := []struct {
-		name     string
-		data     DailyData
-		expected bool
-		err      error
+		name      string
+		data      DailyData
+		expected  bool
+		expectErr error
 	}{
 		{
 			name: "failed, invalid data count",
@@ -88,7 +88,7 @@ func TestDailyData_HasPrecipitationToday(t *testing.T) {
 				Time:             []string{"2024-09-06"},
 				PrecipitationSum: []float64{1.1, 2.2},
 			},
-			err: errors.New("invalid data length time 1, precipitation 2"),
+			expectErr: errors.New("invalid data length time 1, precipitation 2"),
 		},
 		{
 			name: "success, has precipitations",
@@ -111,9 +111,9 @@ func TestDailyData_HasPrecipitationToday(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			precipitation, err := tt.data.HasPrecipitationToday()
-			if tt.err != nil {
-				if err == nil || err.Error() != tt.err.Error() {
-					t.Fatalf("expected error: %v, got: %v", tt.err, err)
+			if tt.expectErr != nil {
+				if err == nil || err.Error() != tt.expectErr.Error() {
+					t.Fatalf("expected error: %v, got: %v", tt.expectErr, err)
 				}
 				return
 			}
