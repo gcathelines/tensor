@@ -1,4 +1,3 @@
-GRAPHIQL_ENABLED = false
 DSN = "postgres://user:pass@localhost:5432/testdb?sslmode=disable"
 
 deps:
